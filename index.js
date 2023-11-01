@@ -4,7 +4,6 @@ const url = require("url");
 
 /////////////////////////////////////////////////////////////////
 //Files
-
 //Blocking,synchronous way
 //const input = fs.readFileSync("./txt/input.txt", "utf-8");
 //console.log(input);
