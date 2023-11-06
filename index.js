@@ -28,6 +28,15 @@ const url = require("url");
 console.log("Will read file!"); */
 /////////////////////////////////////////////////////////
 //SERVER
+//synchronous version->blocks the code execution but not a problem here
+//reading the file synchronously
+const data = fs.readFileSync(
+  `${__dirname}/dev-data/data.json`,
+  "utf-8"
+  //(err,data)=>callback function
+);
+const dataObject = JSON.parse(data);
+
 const server = http.createServer((req, res) => {
   const pathNmae = req.url;
   if (pathNmae === "/" || pathNmae === "/overview") {
@@ -36,10 +45,12 @@ const server = http.createServer((req, res) => {
     res.end("This is the Product");
   } //api
   else if (pathNmae === "/api") {
-    res.end("API");
+    //sending the object as a response
+    res.writeHead(200, { "Content-type": "application/json" });
+    res.end(data);
   } else {
     res.writeHead(404, {
-      "Content-type": "text/html",
+      "Content-type": "text/html", //sending header
       "my-own-header": "hello-world",
     }); //Generating the error 404
     res.end("<h1>Page Not Found!</h1>");
@@ -49,3 +60,4 @@ const server = http.createServer((req, res) => {
 server.listen(7000, "127.0.0.1", () => {
   console.log("Listening to requests on port 8000");
 });
+//An api is a service from which we can request data
