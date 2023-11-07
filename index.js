@@ -30,6 +30,22 @@ console.log("Will read file!"); */
 //SERVER
 //synchronous version->blocks the code execution but not a problem here
 //reading the file synchronously
+//overview
+const tempOverview = fs.readFileSync(
+  `${__dirname}/templates/template-overview.html`,
+  "utf-8"
+);
+//product
+const tempProduct = fs.readFileSync(
+  `${__dirname}/templates/template-product.html`,
+  "utf-8"
+);
+//card
+const tempCard = fs.readFileSync(
+  `${__dirname}/templates/template-card.html`,
+  "utf-8"
+);
+
 const data = fs.readFileSync(
   `${__dirname}/dev-data/data.json`,
   "utf-8"
@@ -39,15 +55,24 @@ const dataObject = JSON.parse(data);
 
 const server = http.createServer((req, res) => {
   const pathNmae = req.url;
+
+  //Overview page
   if (pathNmae === "/" || pathNmae === "/overview") {
-    res.end("This is the Overview"); //sending response to the client
+    res.writeHead(200, { "Content-type": "text/html" });
+    res.end(tempOverview); //sending response to the client
+
+    //Product Page
   } else if (pathNmae === "/product") {
     res.end("This is the Product");
-  } //api
+  }
+
+  //API
   else if (pathNmae === "/api") {
     //sending the object as a response
     res.writeHead(200, { "Content-type": "application/json" });
     res.end(data);
+
+    //Not found
   } else {
     res.writeHead(404, {
       "Content-type": "text/html", //sending header
