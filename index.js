@@ -2,6 +2,8 @@ const fs = require("fs");
 const http = require("http");
 const url = require("url");
 
+const replaceTemplate = require("./modules/replaceTemplate");
+
 /////////////////////////////////////////////////////////////////
 //Files
 //Blocking,synchronous way
@@ -30,6 +32,7 @@ console.log("Will read file!"); */
 //SERVER
 //synchronous version->blocks the code execution but not a problem here
 //reading the file synchronously
+
 //overview
 const tempOverview = fs.readFileSync(
   `${__dirname}/templates/template-overview.html`,
@@ -54,20 +57,30 @@ const data = fs.readFileSync(
 const dataObject = JSON.parse(data);
 
 const server = http.createServer((req, res) => {
-  const pathNmae = req.url;
+  const { query, pathname } = url.parse(req.url, true);
 
   //Overview page
-  if (pathNmae === "/" || pathNmae === "/overview") {
+  if (pathname === "/" || pathname === "/overview") {
     res.writeHead(200, { "Content-type": "text/html" });
-    res.end(tempOverview); //sending response to the client
+
+    const cardsHTML = dataObject
+      .map((el) => replaceTemplate(tempCard, el))
+      .join(""); //we use map to return something
+    const output = tempOverview.replace("{%PRODUCT_CARDS%}", cardsHTML);
+
+    res.end(output); //sending response to the client
 
     //Product Page
-  } else if (pathNmae === "/product") {
-    res.end("This is the Product");
+  } else if (pathname === "/product") {
+    res.writeHead(200, { "Content-type": "text/html" });
+    const product = dataObject[query.id];
+    const output = replaceTemplate(tempProduct, product);
+
+    res.end(output);
   }
 
   //API
-  else if (pathNmae === "/api") {
+  else if (pathname === "/api") {
     //sending the object as a response
     res.writeHead(200, { "Content-type": "application/json" });
     res.end(data);
